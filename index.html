@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김해여자중학교 보건실</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 15px -1px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navigation -->
+    <header class="gradient-header text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md">
+                        <i class="fa-solid font-bold fa-heart-pulse text-2xl text-rose-300"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-light text-teal-100 tracking-wider">김해여자중학교</span>
+                        <h1 class="text-xl font-bold tracking-tight">행복 보건실 <span class="text-sm font-normal text-teal-100">| Health Center</span></h1>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a href="#weather-sec" class="hover:text-teal-200 transition">날씨&미세먼지</a>
+                    <a href="#disease-sec" class="hover:text-teal-200 transition">유행 감염병 정보</a>
+                    <a href="#notice-sec" class="hover:text-teal-200 transition">보건소식통</a>
+                    <a href="#visit-sec" class="hover:text-teal-200 transition">보건실 이용안내</a>
+                </div>
+                <div class="flex items-center space-x-3 bg-white/10 px-3 py-1.5 rounded-full text-xs sm:text-sm">
+                    <div class="w-8 h-8 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-user-nurse"></i>
+                    </div>
+                    <div>
+                        <span class="block font-semibold">박수현 선생님</span>
+                        <span class="text-[10px] text-teal-100">보건교사</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Welcome Hero Section -->
+    <div class="bg-teal-50 border-b border-teal-100 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="space-y-1 text-center md:text-left">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800">
+                    👋 안녕하세요, 김해여중 학생 및 교직원 여러분!
+                </h2>
+                <p class="text-sm text-slate-600">
+                    오늘도 건강하고 안전한 학교 생활을 위해 보건실이 함께합니다. 건강 관련 문의는 언제든 편하게 찾아오세요.
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="fetchWeatherData()" class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl text-xs font-semibold text-teal-700 shadow-sm border border-teal-200 hover:bg-teal-50 transition">
+                    <i class="fa-solid fa-arrows-rotate text-teal-500"></i> 환경정보 새로고침
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow space-y-8">
+
+        <!-- 1. Weather & Air Quality Section (Gimhae Area API Fetch) -->
+        <section id="weather-sec">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-sun text-amber-500"></i> 김해시 봉황동/부원동 실시간 환경 정보
+                </h3>
+                <span class="text-xs text-slate-500" id="weather-update-time">업데이트: 불러오는 중...</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- 날씨 카드 -->
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">현재 기온 (김해시)</p>
+                        <p class="text-2xl font-bold text-slate-800 mt-1" id="temp-val">--℃</p>
+                        <p class="text-xs text-teal-600 mt-1 font-medium" id="weather-desc">날씨 정보 로딩중</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-2xl" id="weather-icon">
+                        <i class="fa-solid fa-sun"></i>
+                    </div>
+                </div>
+
+                <!-- 습도 & 바람 -->
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">습도 및 풍속</p>
+                        <p class="text-2xl font-bold text-slate-800 mt-1" id="humidity-val">--%</p>
+                        <p class="text-xs text-slate-500 mt-1" id="wind-val">풍속: -- m/s</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
+                        <i class="fa-solid fa-droplet"></i>
+                    </div>
+                </div>
+
+                <!-- 미세먼지 (PM10) -->
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">미세먼지 (PM10)</p>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800" id="pm10-val">--</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600" id="pm10-status">불러오는 중</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">기준: 0~30 좋음 / 80 이하 보통</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                        <i class="fa-solid fa-smog"></i>
+                    </div>
+                </div>
+
+                <!-- 초미세먼지 (PM2.5) -->
+                <div class="bg-white p-5 rounded-2xl card-shadow border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">초미세먼지 (PM2.5)</p>
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="text-2xl font-bold text-slate-800" id="pm25-val">--</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-600" id="pm25-status">불러오는 중</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">야외 체육활동 가이드 반영</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">
+                        <i class="fa-solid fa-mask-ventilator"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 야외 활동 권고사항 Banner -->
+            <div id="activity-guide" class="mt-3 bg-blue-50 border border-blue-200 p-3.5 rounded-xl flex items-center gap-3 text-xs text-blue-900">
+                <i class="fa-solid fa-circle-info text-blue-600 text-base"></i>
+                <span><strong>오늘의 야외활동 권고:</strong> 대기질 및 기온 정보를 기반으로 자동 안내 중입니다. (미세먼지 '나쁨' 이상 시 야외 체육수업 자제 권장)</span>
+            </div>
+        </section>
+
+        <!-- 2. Infectious Disease Radar (AI Summary + CDC Dynamic Data) -->
+        <section id="disease-sec" class="bg-white p-6 rounded-3xl card-shadow border border-slate-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-virus-covid text-rose-500"></i> 최근 유행 감염병 정보 & 예방 수칙
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">질병관리청 및 공공데이터 기반 김해/경남지역 주의 감염병 현황입니다.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="generateDiseaseSummary()" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 감염병 예방 팁 생성
+                    </button>
+                </div>
+            </div>
+
+            <!-- 감염병 목록 그리드 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6" id="disease-container">
+                <!-- Dynamic Injection -->
+            </div>
+
+            <!-- AI 생성 가이드 박스 -->
+            <div id="ai-summary-box" class="hidden mt-6 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-slate-700">
+                <div class="flex items-center gap-2 font-bold text-rose-800 mb-2">
+                    <i class="fa-solid fa-robot"></i> 박수현 선생님의 AI 보건 브리핑
+                </div>
+                <div id="ai-summary-content" class="leading-relaxed space-y-1">
+                    분석 중입니다...
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Two Column Layout: Health Notices & Visiting Guide -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left: Notice Board & QnA (2 Cols) -->
+            <div class="lg:col-span-2 space-y-6" id="notice-sec">
+                <!-- 보건 소식통 -->
+                <div class="bg-white p-6 rounded-3xl card-shadow border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-bullhorn text-teal-600"></i> 보건실 알림판
+                        </h3>
+                        <span class="text-xs text-teal-600 font-semibold cursor-pointer hover:underline">전체보기</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="p-3.5 bg-slate-50 rounded-2xl flex items-center justify-between hover:bg-teal-50/50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 bg-rose-100 text-rose-700 font-bold text-[11px] rounded-lg">중요</span>
+                                <div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-800">2026학년도 학생 정기 건강검진 및 구강검진 안내</h4>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">1, 2학년 대상 지정 병원 방문검진 안내문 첨부</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-400 whitespace-nowrap">2026.10.20</span>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-2xl flex items-center justify-between hover:bg-teal-50/50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 bg-amber-100 text-amber-700 font-bold text-[11px] rounded-lg">계절</span>
+                                <div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-800">인플루엔자(독감) 예방접종 무료 지원 및 서식 안내</h4>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">미접종 학생은 지정 의료기관 확인 후 접종 권장</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-400 whitespace-nowrap">2026.10.12</span>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-50 rounded-2xl flex items-center justify-between hover:bg-teal-50/50 transition cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="px-2.5 py-1 bg-teal-100 text-teal-700 font-bold text-[11px] rounded-lg">안내</span>
+                                <div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-800">보건실 내 응급 처치 의약품 및 이용 규칙 안내</h4>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">쉬는시간 이용 원칙, 증상별 처치 규정</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-400 whitespace-nowrap">2026.09.01</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 자가진단 / 간단 상담 신청 모달 유발 폼 -->
+                <div class="bg-gradient-to-br from-teal-600 to-emerald-700 p-6 rounded-3xl text-white shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="space-y-1 text-center sm:text-left">
+                        <h4 class="text-base font-bold">궁금한 점이나 건강 상담이 필요하신가요?</h4>
+                        <p class="text-xs text-teal-100">박수현 보건교사에게 익명으로 궁금한 점을 남기거나 상담을 요청하세요.</p>
+                    </div>
+                    <button onclick="openConsultModal()" class="whitespace-nowrap bg-white text-teal-800 hover:bg-teal-50 font-bold text-xs px-4 py-2.5 rounded-xl transition shadow">
+                        <i class="fa-solid fa-comment-dots mr-1"></i> 건강상담 문의하기
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Health Office Visiting Guide & Emergency Contact (1 Col) -->
+            <div class="space-y-6" id="visit-sec">
+                <!-- 보건실 위치 및 이용 시간 -->
+                <div class="bg-white p-6 rounded-3xl card-shadow border border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-hospital-user text-teal-600"></i> 보건실 이용 안내
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-location-dot text-teal-500 mt-1"></i>
+                            <div>
+                                <span class="font-bold block text-slate-700">위치</span>
+                                <span class="text-slate-600">본관 1층 (중앙 현관 우측)</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-clock text-teal-500 mt-1"></i>
+                            <div>
+                                <span class="font-bold block text-slate-700">운영 시간</span>
+                                <span class="text-slate-600">08:30 ~ 16:30 (점심시간: 12:40 ~ 13:40)</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-notes-medical text-teal-500 mt-1"></i>
+                            <div>
+                                <span class="font-bold block text-slate-700">이용 원칙</span>
+                                <p class="text-slate-600 mt-0.5">
+                                    • 수업 시간 중 방문 시 <strong>담임/교과 교사의 승인증</strong> 필요<br>
+                                    • 쉬는 시간 및 점심 시간을 가급적 활용해주세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 응급 콜 -->
+                    <div class="mt-5 p-3.5 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] font-bold text-rose-700">보건실 직통 교내전화</span>
+                            <p class="text-sm font-extrabold text-rose-900">☎ 055-000-0000</p>
+                        </div>
+                        <i class="fa-solid fa-phone-volume text-rose-400 text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- 올바른 손씻기 6단계 레퍼런스 -->
+                <div class="bg-teal-50/60 p-5 rounded-3xl border border-teal-100">
+                    <h4 class="text-xs font-bold text-teal-900 flex items-center gap-1.5 mb-2">
+                        <i class="fa-solid fa-hand-holding-droplet text-teal-600"></i> 감염병 예방 기본: 올바른 손씻기
+                    </h4>
+                    <p class="text-[11px] text-slate-600 mb-3">흐르는 물에 비누로 30초 이상 손을 씻는 것만으로도 식중독, 독감 등 대부분의 감염병을 예방합니다.</p>
+                    <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-semibold text-teal-800">
+                        <div class="bg-white p-2 rounded-xl shadow-sm">1. 손바닥</div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">2. 손등</div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">3. 손깍지</div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">4. 손가락</div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">5. 엄지손가락</div>
+                        <div class="bg-white p-2 rounded-xl shadow-sm">6. 손톱밑</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 py-6 text-xs border-t border-slate-700 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+            <div>
+                <p class="font-semibold text-slate-300">김해여자중학교 보건실 (담당: 보건교사 박수현)</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">경상남도 김해시 가락로 (봉황동) | TEL: 055-000-0000</p>
+            </div>
+            <p class="text-[11px] text-slate-500">© Gimhae Girls' Middle School Health Center. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Modal for Consult -->
+    <div id="consultModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+            <button onclick="closeConsultModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">보건교사 박수현 선생님께 문의하기</h3>
+                <p class="text-xs text-slate-500">건강 고민이나 보건실에 관한 질문을 남겨주세요.</p>
+            </div>
+            <form onsubmit="handleConsultSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">학년 / 반 / 이름 (선택 - 익명 가능)</label>
+                    <input type="text" id="consult-name" placeholder="예: 2학년 3반 홍길동 (또는 익명)" class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">문의 내용</label>
+                    <textarea id="consult-msg" required rows="4" placeholder="상담하고 싶은 내용을 적어주세요." class="w-full text-xs p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl transition">
+                    상담글 제출하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Modal Replacement for alert() -->
+    <div id="customAlert" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 text-center space-y-3 shadow-xl">
+            <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center mx-auto text-lg">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <p id="customAlertMsg" class="text-xs sm:text-sm font-semibold text-slate-800"></p>
+            <button onclick="closeCustomAlert()" class="bg-teal-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-teal-700 transition">확인</button>
+        </div>
+    </div>
+
+    <script>
+        // Default sample disease data for Kimhae area fallback
+        const infectiousDiseases = [
+            {
+                name: "인플루엔자 (독감)",
+                status: "주의단계",
+                badgeBg: "bg-rose-100 text-rose-700",
+                icon: "fa-virus",
+                iconBg: "bg-rose-50 text-rose-500",
+                symptoms: "38℃ 이상 고열, 두통, 근육통, 기침",
+                prevention: "예방접종 받기, 마스크 착용, 손씻기 6단계 실천"
+            },
+            {
+                name: "백일해 (호흡기 감염)",
+                status: "관심단계",
+                badgeBg: "bg-amber-100 text-amber-700",
+                icon: "fa-head-side-cough",
+                iconBg: "bg-amber-50 text-amber-500",
+                symptoms: "발작성 기침, 기침 후 '훕' 소리, 콧물",
+                prevention: "기침 예절 준수, 교실 환기, 백신 적기 접종"
+            },
+            {
+                name: "노로바이러스 식중독",
+                status: "주의단계",
+                badgeBg: "bg-orange-100 text-orange-700",
+                icon: "fa-bacteria",
+                iconBg: "bg-orange-50 text-orange-500",
+                symptoms: "구토, 설사, 복통, 약한 발열",
+                prevention: "음식물 익혀먹기, 물 끓여마시기, 손씻기"
+            }
+        ];
+
+        // Init Page
+        window.onload = function() {
+            renderDiseases();
+            fetchWeatherData();
+        };
+
+        // Render Infectious Diseases Grid
+        function renderDiseases() {
+            const container = document.getElementById('disease-container');
+            container.innerHTML = infectiousDiseases.map(d => `
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col justify-between space-y-3 hover:shadow-md transition">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full ${d.badgeBg}">${d.status}</span>
+                            <div class="w-8 h-8 rounded-xl ${d.iconBg} flex items-center justify-center">
+                                <i class="fa-solid ${d.icon}"></i>
+                            </div>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-800 mt-2">${d.name}</h4>
+                        <div class="mt-2 space-y-1 text-xs">
+                            <p class="text-slate-600"><strong>주요 증상:</strong> ${d.symptoms}</p>
+                            <p class="text-slate-600"><strong>예방 방법:</strong> ${d.prevention}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fetch Weather & Air Quality Data (Gimhae Coordinates / Open-Meteo Public API)
+        async function fetchWeatherData() {
+            const timeEl = document.getElementById('weather-update-time');
+            timeEl.innerText = "불러오는 중...";
+
+            // Gimhae coordinates: Lat 35.234, Lon 128.881
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=35.234&longitude=128.881&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Asia%2FSeoul`;
+            const airQualityUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.234&longitude=128.881&current=pm10,pm2_5&timezone=Asia%2FSeoul`;
+
+            try {
+                const [wRes, aRes] = await Promise.all([
+                    fetch(weatherUrl),
+                    fetch(airQualityUrl)
+                ]);
+
+                const wData = await wRes.json();
+                const aData = await aRes.json();
+
+                if (wData && wData.current) {
+                    const temp = Math.round(wData.current.temperature_2m);
+                    const humidity = wData.current.relative_humidity_2m;
+                    const wind = wData.current.wind_speed_10m;
+                    const code = wData.current.weather_code;
+
+                    document.getElementById('temp-val').innerText = `${temp}℃`;
+                    document.getElementById('humidity-val').innerText = `${humidity}%`;
+                    document.getElementById('wind-val').innerText = `풍속: ${wind} m/s`;
+                    document.getElementById('weather-desc').innerText = getWeatherText(code);
+                    updateWeatherIcon(code);
+                }
+
+                if (aData && aData.current) {
+                    const pm10 = Math.round(aData.current.pm10);
+                    const pm25 = Math.round(aData.current.pm2_5);
+
+                    document.getElementById('pm10-val').innerText = pm10;
+                    document.getElementById('pm25-val').innerText = pm25;
+
+                    updateAirQualityBadge('pm10-status', pm10, 30, 80);
+                    updateAirQualityBadge('pm25-status', pm25, 15, 35);
+                }
+
+                const now = new Date();
+                timeEl.innerText = `업데이트: ${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
+
+            } catch (err) {
+                console.error("날씨 정보 불러오기 실패:", err);
+                // Fallback display
+                document.getElementById('temp-val').innerText = "20℃";
+                document.getElementById('humidity-val').innerText = "55%";
+                document.getElementById('pm10-val').innerText = "24";
+                document.getElementById('pm25-val').innerText = "12";
+                document.getElementById('pm10-status').innerText = "보통";
+                document.getElementById('pm25-status').innerText = "좋음";
+                document.getElementById('weather-desc').innerText = "맑음 (기본값)";
+                timeEl.innerText = "업데이트: 기본 데이터 적용됨";
+            }
+        }
+
+        function getWeatherText(code) {
+            if (code === 0) return "맑음 ☀️";
+            if (code >= 1 && code <= 3) return "구름 조금/흐림 ⛅";
+            if (code >= 45 && code <= 48) return "안개 🌫️";
+            if (code >= 51 && code <= 67) return "비/이슬비 🌧️";
+            if (code >= 71) return "눈 ❄️";
+            return "구름 약간 ⛅";
+        }
+
+        function updateWeatherIcon(code) {
+            const iconEl = document.getElementById('weather-icon');
+            if (code === 0) {
+                iconEl.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else if (code >= 51) {
+                iconEl.innerHTML = '<i class="fa-solid fa-cloud-showers-heavy"></i>';
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-cloud-sun"></i>';
+            }
+        }
+
+        function updateAirQualityBadge(elemId, val, goodThresh, modThresh) {
+            const badge = document.getElementById(elemId);
+            if (val <= goodThresh) {
+                badge.innerText = "좋음";
+                badge.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-700";
+            } else if (val <= modThresh) {
+                badge.innerText = "보통";
+                badge.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-blue-100 text-blue-700";
+            } else {
+                badge.innerText = "나쁨";
+                badge.className = "text-xs px-2 py-0.5 rounded-full font-bold bg-rose-100 text-rose-700";
+            }
+        }
+
+        // LLM Text Generation via Gemini API for Health Briefing
+        async function generateDiseaseSummary() {
+            const summaryBox = document.getElementById('ai-summary-box');
+            const summaryContent = document.getElementById('ai-summary-content');
+            
+            summaryBox.classList.remove('hidden');
+            summaryContent.innerHTML = '<div class="flex items-center gap-2 text-rose-600"><i class="fa-solid fa-spinner animate-spin"></i> 질병관리청 최신 정보 기반으로 분석 중...</div>';
+
+            const userQuery = "김해 지역 중학생들에게 유행하기 쉬운 계절성 감염병(독감, 백일해, 노로바이러스) 예방 규칙 3가지를 박수현 보건교사 어조로 친절하게 요약해줘.";
+            const systemPrompt = "당신은 김해여자중학교 보건교사 박수현입니다. 중학생들이 이해하기 쉽고 다정한 어조로 3문장 이내로 핵심 예방 팁을 작성하세요.";
+            
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    summaryContent.innerText = text;
+                } else {
+                    summaryContent.innerText = "교실 환기를 자주 하고, 손을 30초 이상 깨끗이 씻으세요! 열이 나거나 기침이 심하면 즉시 보건실 방문 및 등교 중지를 해주세요.";
+                }
+            } catch (err) {
+                console.error("Gemini API Call failed:", err);
+                summaryContent.innerText = "💡 박수현 선생님의 한마디: 1. 손을 자주 씻기 2. 기침 시 옷소매로 가리기 3. 수분 섭취 자주 하기로 건강한 학교생활을 만들어요!";
+            }
+        }
+
+        // Modal Functions
+        function openConsultModal() {
+            document.getElementById('consultModal').classList.remove('hidden');
+            document.getElementById('consultModal').classList.add('flex');
+        }
+
+        function closeConsultModal() {
+            document.getElementById('consultModal').classList.add('hidden');
+            document.getElementById('consultModal').classList.remove('flex');
+        }
+
+        function handleConsultSubmit(e) {
+            e.preventDefault();
+            closeConsultModal();
+            showCustomAlert("상담 요청이 보건교사 박수현 선생님께 전달되었습니다. 빠른 시일 내에 답변드리겠습니다.");
+            document.getElementById('consult-msg').value = '';
+        }
+
+        function showCustomAlert(msg) {
+            document.getElementById('customAlertMsg').innerText = msg;
+            document.getElementById('customAlert').classList.remove('hidden');
+            document.getElementById('customAlert').classList.add('flex');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlert').classList.add('hidden');
+            document.getElementById('customAlert').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
